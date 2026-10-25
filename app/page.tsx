@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AuthStatus from "@/components/AuthStatus";
 import { supabase } from "@/lib/supabase";
+import SaveButton from "@/components/SaveButton";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,7 @@ export default async function Home() {
               <p className="text-xs text-gray-400">
                 {outfit.vibe_tags?.map((t: string) => `#${t}`).join(" ")}
               </p>
+              <SaveButton outfitId={outfit.id} />
             </div>
           ))}
         </div>
