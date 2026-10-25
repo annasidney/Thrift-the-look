@@ -1,7 +1,7 @@
 import Link from "next/link";
 import AuthStatus from "@/components/AuthStatus";
-import { supabase } from "@/lib/supabase";
 import SaveButton from "@/components/SaveButton";
+import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +18,9 @@ export default async function Home() {
         <div className="flex items-center gap-6">
           <Link className="underline text-sm" href="/upload">
             Upload
+          </Link>
+          <Link className="underline text-sm" href="/boards">
+            Saved
           </Link>
           <AuthStatus />
         </div>
