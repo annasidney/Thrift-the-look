@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import AuthStatus from "@/components/AuthStatus";
-import SaveButton from "@/components/SaveButton";
+import OutfitCard from "@/components/OutfitCard";
 import { createClient } from "@/lib/supabase-browser";
 
 type Outfit = {
@@ -11,6 +10,11 @@ type Outfit = {
   title: string;
   image_url: string;
   vibe_tags: string[] | null;
+};
+
+type SaveRow = {
+  created_at: string;
+  outfits: Outfit | null;
 };
 
 export default function BoardsPage() {
@@ -33,59 +37,52 @@ export default function BoardsPage() {
         .select("created_at, outfits(id, title, image_url, vibe_tags)")
         .order("created_at", { ascending: false });
 
-      const list = (data ?? [])
-        .map((row: any) => row.outfits)
-        .filter(Boolean) as Outfit[];
+      const list = ((data as unknown as SaveRow[]) ?? [])
+        .map((row) => row.outfits)
+        .filter((o): o is Outfit => Boolean(o));
       setOutfits(list);
       setLoading(false);
     }
     load();
-  }, []);
+  }, [supabase]);
 
   return (
-    <main className="p-8">
-      <header className="mb-8 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold">
-          ThriftTheLook
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link className="underline text-sm" href="/upload">
-            Upload
-          </Link>
-          <AuthStatus />
-        </div>
-      </header>
-
-      <h2 className="mb-6 text-xl font-semibold">Your saved outfits</h2>
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8">
+      <h1 className="mb-2 text-2xl font-bold tracking-tight text-neutral-900">
+        Your saved outfits
+      </h1>
+      <p className="mb-6 text-sm text-neutral-500">
+        Outfits you have saved to your board.
+      </p>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-sm text-neutral-500">Loading...</p>
       ) : !loggedIn ? (
-        <p>
-          Please <Link className="underline" href="/login">log in</Link> to see
-          your saved outfits.
+        <p className="text-sm text-neutral-600">
+          Please{" "}
+          <Link className="font-semibold text-neutral-900 underline" href="/login">
+            log in
+          </Link>{" "}
+          to see your saved outfits.
         </p>
       ) : outfits.length === 0 ? (
-        <p>
+        <p className="text-sm text-neutral-600">
           Nothing saved yet. Go to the{" "}
-          <Link className="underline" href="/">feed</Link> and save some outfits.
+          <Link className="font-semibold text-neutral-900 underline" href="/">
+            feed
+          </Link>{" "}
+          and save some outfits.
         </p>
       ) : (
-        <div className="columns-2 gap-4 md:columns-3 lg:columns-4">
+        <div className="columns-2 gap-4 sm:columns-3 lg:columns-4 xl:columns-5">
           {outfits.map((outfit) => (
-            <div key={outfit.id} className="mb-4 break-inside-avoid">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={outfit.image_url}
-                alt={outfit.title}
-                className="w-full rounded-xl"
-              />
-              <p className="mt-2 text-sm font-semibold">{outfit.title}</p>
-              <p className="text-xs text-gray-400">
-                {outfit.vibe_tags?.map((t) => `#${t}`).join(" ")}
-              </p>
-              <SaveButton outfitId={outfit.id} />
-            </div>
+            <OutfitCard
+              key={outfit.id}
+              id={outfit.id}
+              title={outfit.title}
+              imageUrl={outfit.image_url}
+              subtitle={outfit.vibe_tags?.map((t) => `#${t}`).join(" ")}
+            />
           ))}
         </div>
       )}

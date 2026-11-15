@@ -1,6 +1,5 @@
 import Link from "next/link";
-import AuthStatus from "@/components/AuthStatus";
-import SaveButton from "@/components/SaveButton";
+import OutfitCard from "@/components/OutfitCard";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -41,32 +40,16 @@ export default async function VibesPage({
   }
 
   return (
-    <main className="p-8">
-      <header className="mb-8 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold">
-          ThriftTheLook
-        </Link>
-        <div className="flex items-center gap-6">
-          <Link className="underline text-sm font-semibold" href="/vibes">
-            Vibes
-          </Link>
-          <Link className="underline text-sm" href="/upload">
-            Upload
-          </Link>
-          <Link className="underline text-sm" href="/boards">
-            Saved
-          </Link>
-          <AuthStatus />
-        </div>
-      </header>
-
-      <h1 className="mb-1 text-xl font-semibold">Shop by vibe</h1>
-      <p className="mb-5 text-sm text-gray-500">
-        Pick a vibe and our AI finds outfits that look like it.
+    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8">
+      <h1 className="mb-1 text-2xl font-bold tracking-tight text-neutral-900">
+        Shop by vibe
+      </h1>
+      <p className="mb-6 text-sm text-neutral-500">
+        Pick a vibe and our AI finds outfits that match the aesthetic.
       </p>
 
       {vibes.length === 0 ? (
-        <p className="text-sm">
+        <p className="text-sm text-neutral-500">
           No vibes yet. Run <code>python embed_vibes.py</code> in the seed folder.
         </p>
       ) : (
@@ -79,8 +62,8 @@ export default async function VibesPage({
                 href={`/vibes?v=${vb.slug}`}
                 className={`rounded-full border px-4 py-1.5 text-sm transition ${
                   active
-                    ? "border-black bg-black text-white"
-                    : "border-gray-300 hover:border-black"
+                    ? "border-neutral-900 bg-neutral-900 font-medium text-white"
+                    : "border-neutral-300 bg-white text-neutral-700 hover:border-neutral-900"
                 }`}
               >
                 {vb.label}
@@ -91,31 +74,25 @@ export default async function VibesPage({
       )}
 
       {errorMessage && (
-        <p className="mb-4 text-sm text-red-600">
+        <p className="mb-4 text-sm text-rose-600">
           Could not load outfits: {errorMessage}
         </p>
       )}
 
       {activeVibe && results.length > 0 && (
         <>
-          <h2 className="mb-3 text-lg font-semibold">{activeVibe.label} looks</h2>
-          <div className="columns-2 gap-3 sm:columns-3 lg:columns-5 xl:columns-6">
+          <h2 className="mb-4 text-lg font-semibold text-neutral-900">
+            {activeVibe.label} looks
+          </h2>
+          <div className="columns-2 gap-4 sm:columns-3 lg:columns-4 xl:columns-5">
             {results.map((outfit) => (
-              <div key={outfit.id} className="mb-3 break-inside-avoid">
-                <Link href={`/outfit/${outfit.id}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={outfit.image_url}
-                    alt={outfit.title}
-                    className="w-full max-h-96 rounded-2xl object-cover"
-                  />
-                </Link>
-                <p className="mt-2 text-xs font-medium">{outfit.title}</p>
-                <p className="text-[10px] text-gray-400">
-                  {Math.round(outfit.similarity * 100)}% vibe match
-                </p>
-                <SaveButton outfitId={outfit.id} />
-              </div>
+              <OutfitCard
+                key={outfit.id}
+                id={outfit.id}
+                title={outfit.title}
+                imageUrl={outfit.image_url}
+                subtitle={`${Math.round(outfit.similarity * 100)}% vibe match`}
+              />
             ))}
           </div>
         </>

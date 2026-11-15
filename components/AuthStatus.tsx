@@ -23,7 +23,7 @@ export default function AuthStatus() {
     );
 
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [supabase]);
 
   async function handleLogout() {
     await supabase.auth.signOut();
