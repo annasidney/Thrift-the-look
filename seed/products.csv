@@ -1,0 +1,19 @@
+name,category,price_inr,tier,store,link,image_file
+White tee,top,500,thrift,Thrift store,PASTE_LINK,top_thrift.jpg
+Crop top,top,1300,mid,Myntra,PASTE_LINK,top_mid.jpg
+Silk blouse,top,4000,premium,Myntra,PASTE_LINK,top_premium.jpg
+Baggy jeans,bottom,600,thrift,Thrift store,PASTE_LINK,bottom_thrift.jpg
+Cargo pants,bottom,1500,mid,Myntra,PASTE_LINK,bottom_mid.jpg
+Tailored trousers,bottom,4000,premium,Myntra,PASTE_LINK,bottom_premium.jpg
+Floral dress,dress,700,thrift,Thrift store,PASTE_LINK,dress_thrift.jpg
+Black bodycon dress,dress,1500,mid,Myntra,PASTE_LINK,dress_mid.jpg
+Satin slip dress,dress,4500,premium,Myntra,PASTE_LINK,dress_premium.jpg
+Denim jacket,outerwear,800,thrift,Thrift store,PASTE_LINK,outerwear_thrift.jpg
+Bomber jacket,outerwear,1800,mid,Myntra,PASTE_LINK,outerwear_mid.jpg
+Blazer,outerwear,5000,premium,Myntra,PASTE_LINK,outerwear_premium.jpg
+Canvas sneakers,shoes,600,thrift,Thrift store,PASTE_LINK,shoes_thrift.jpg
+Chunky sneakers,shoes,2000,mid,Myntra,PASTE_LINK,shoes_mid.jpg
+Heels,shoes,4500,premium,Myntra,PASTE_LINK,shoes_premium.jpg
+Tote bag,bag,500,thrift,Thrift store,PASTE_LINK,bag_thrift.jpg
+Sling bag,bag,1500,mid,Myntra,PASTE_LINK,bag_mid.jpg
+Leather handbag,bag,5000,premium,Myntra,PASTE_LINK,bag_premium.jpg
