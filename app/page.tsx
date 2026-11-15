@@ -1,5 +1,5 @@
 import Link from "next/link";
-import OutfitCard from "@/components/OutfitCard";
+import FeedGrid from "@/components/FeedGrid";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,8 @@ export default async function Home() {
   const { data: outfits } = await supabase
     .from("outfits")
     .select("id, title, image_url, vibe_tags")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(0, 19);
 
   const { data: trendingData } = await supabase.rpc("trending_outfits", {
     window_days: 7,
@@ -75,26 +76,10 @@ export default async function Home() {
       )}
 
       {/* Main feed */}
-      {!outfits || outfits.length === 0 ? (
-        <p className="text-neutral-500">No outfits yet. Upload the first one!</p>
-      ) : (
-        <>
-          <h2 className="mb-4 text-xl font-bold tracking-tight text-neutral-900">
-            Discover
-          </h2>
-          <div className="columns-2 gap-4 sm:columns-3 lg:columns-4 xl:columns-5">
-            {outfits.map((outfit) => (
-              <OutfitCard
-                key={outfit.id}
-                id={outfit.id}
-                title={outfit.title}
-                imageUrl={outfit.image_url}
-                subtitle={outfit.vibe_tags?.map((t: string) => `#${t}`).join(" ")}
-              />
-            ))}
-          </div>
-        </>
-      )}
+      <h2 className="mb-4 text-xl font-bold tracking-tight text-neutral-900">
+        Discover
+      </h2>
+      <FeedGrid initialOutfits={outfits ?? []} />
     </main>
   );
 }
