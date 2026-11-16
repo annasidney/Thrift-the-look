@@ -1,5 +1,11 @@
 import Link from "next/link";
 import FeedGrid from "@/components/FeedGrid";
+import RunwayHero, {
+  CutoutBox,
+  RunwayOutfit,
+  RunwayPiece,
+  RunwayShopRow,
+} from "@/components/RunwayHero";
 import { supabase } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +18,81 @@ type TrendingOutfit = {
 };
 
 export default async function Home() {
+  // Fetch featured outfits for the Runway Hero (up to 8, ordered by id)
+  const { data: featuredData } = await supabase
+    .from("outfits")
+    .select("id, title, cutout_url, cutout_box")
+    .eq("featured", true)
+    .not("cutout_url", "is", null)
+    .order("id")
+    .limit(8);
+
+  const rawFeatured =
+    (featuredData as {
+      id: string;
+      title: string;
+      cutout_url: string | null;
+      cutout_box: CutoutBox | null;
+    }[]) ?? [];
+
+  let featuredOutfits: RunwayOutfit[] = [];
+  if (rawFeatured.length >= 3) {
+    const featuredIds = rawFeatured.map((o) => o.id);
+    const [{ data: piecesData }, ...shopResults] = await Promise.all([
+      supabase
+        .from("pieces")
+        .select("id, outfit_id, category, image_url, pin_x, pin_y")
+        .in("outfit_id", featuredIds),
+      ...featuredIds.map((id) =>
+        supabase.rpc("outfit_shop", { target_outfit_id: id })
+      ),
+    ]);
+
+    const allPieces = (piecesData as RunwayPiece[]) ?? [];
+
+    featuredOutfits = rawFeatured.map((outfit, index) => {
+      const outfitPieces = allPieces.filter((p) => p.outfit_id === outfit.id);
+      const box = outfit.cutout_box ?? { x0: 0, y0: 0, x1: 1, y1: 1 };
+      const denomX = box.x1 - box.x0;
+      const denomY = box.y1 - box.y0;
+
+      let pinCounter = 1;
+      const processedPieces: RunwayPiece[] = outfitPieces.map((p) => {
+        let pin_left: number | undefined;
+        let pin_top: number | undefined;
+        let pin_number: number | undefined;
+
+        if (p.pin_x != null && p.pin_y != null && denomX > 0 && denomY > 0) {
+          const left = ((p.pin_x / 100 - box.x0) / denomX) * 100;
+          const top = ((p.pin_y / 100 - box.y0) / denomY) * 100;
+          if (left >= 0 && left <= 100 && top >= 0 && top <= 100) {
+            pin_left = left;
+            pin_top = top;
+            pin_number = pinCounter++;
+          }
+        }
+
+        return {
+          ...p,
+          pin_left,
+          pin_top,
+          pin_number,
+        };
+      });
+
+      const shopRows = (shopResults[index]?.data as RunwayShopRow[]) ?? [];
+
+      return {
+        id: outfit.id,
+        title: outfit.title,
+        cutout_url: outfit.cutout_url!,
+        cutout_box: box,
+        pieces: processedPieces,
+        shopRows,
+      };
+    });
+  }
+
   const { data: outfits } = await supabase
     .from("outfits")
     .select("id, title, image_url, vibe_tags")
@@ -26,6 +107,9 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-8">
+      {/* Runway Hero (renders if >= 3 featured outfits) */}
+      <RunwayHero outfits={featuredOutfits} />
+
       {/* Intro */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
